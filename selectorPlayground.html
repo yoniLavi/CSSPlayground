@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CSS Selector Playground</title>
+    <style>
+        #invalid {
+            color: red;
+        }
+        .highlighted {
+            background-color: orange;
+        }
+    </style>
+    <script>
+        function highlightSelected(selector) {
+            try {
+                document.querySelector('#invalid').innerText = "";
+                for (let elem of document.querySelectorAll('*')) {
+                    elem.classList.remove('highlighted');
+                }
+                let matchedElems = document.querySelectorAll(selector);
+                if (matchedElems.length) {
+                    for (let elem of matchedElems) {
+                        elem.classList.add('highlighted');
+                    }
+                } else {
+                    document.querySelector('#invalid').innerText = "No matching elements.";
+                }
+            } catch (err) {
+                let errDetails = err.message.split(':')[1];
+                document.querySelector('#invalid').innerText = errDetails;
+            }
+        }
+    </script>
+</head>
+<body>
+    <input type="text" size="100" id="selector" placeholder="experiment with selectors here"
+           value="ul" oninput="highlightSelected(this.value)">
+    <label id="invalid"></label>
+    <div id="a">
+        a
+        <div id="aa">
+            aa
+        </div>
+    </div>
+    <div id="b">
+        b
+        <ul class="highlighted">
+           <li>1</li>
+           <li>2</li>
+        </ul>
+    </div>
+</body>
+</html>
