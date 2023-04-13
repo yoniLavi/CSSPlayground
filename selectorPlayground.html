@@ -2,52 +2,151 @@
 <html lang="en">
 <head>
     <title>CSS Selector Playground</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: large;
+        }
+
+        header h1 {
+            font-size: xx-large;
+            text-align: center;
+            text-decoration: underline;
+            text-decoration-color: orange;
+            font-family: 'Times New Roman', Times, serif;
+            margin-bottom: 30px;
+        }
+
+        section {
+            margin: 40px 20px;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        #html-playground {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 100%;
+            background-color: #f8f8f8;
+        }
+
+        textarea {
+            font-size: 16px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            height: auto;
+            min-height: 400px; /* to set a minimum height */
+        }
+
         #invalid {
             color: red;
         }
+
         .highlighted {
             background-color: orange;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.1/dist/purify.min.js"></script>
     <script>
-        function highlightSelected(selector) {
+        const initialHTML = (
+            `<div id="a">
+    I'm a div with the id "a"
+    <div id="aa">
+        I'm a div with the id "aa", within "a"
+    </div>
+</div>
+<div id="b">
+    I'm a separate div with the id "b"
+    <ul>
+        <li>I'm a list item</li>
+        <li>I'm another list item</li>
+    </ul>
+</div>
+<table>
+    <caption>I'm a table</caption>
+    <tr>
+        <th>Name</th>
+        <th>Species</th>
+    </tr>
+    <tr>
+        <td>Minnie</td>
+        <td>Cat</td>
+    </tr>
+    <tr>
+        <td>Sparky</td>
+        <td>Lizard</td>
+    </tr>
+    <tr>
+        <td>Bluey</td>
+        <td>Dog</td>
+    </tr>
+</table>`
+        );
+
+        const initialSelector = `table tr:nth-child(even)`;
+
+        function updateHighlight() {
+            const selector = document.querySelector('#selector').value;
             try {
                 document.querySelector('#invalid').innerText = "";
-                for (let elem of document.querySelectorAll('*')) {
+                for (const elem of document.querySelectorAll('*')) {
                     elem.classList.remove('highlighted');
                 }
-                let matchedElems = document.querySelectorAll(selector);
+                const matchedElems = document.querySelectorAll(selector);
                 if (matchedElems.length) {
-                    for (let elem of matchedElems) {
+                    for (const elem of matchedElems) {
                         elem.classList.add('highlighted');
                     }
                 } else {
                     document.querySelector('#invalid').innerText = "No matching elements.";
                 }
             } catch (err) {
-                let errDetails = err.message.split(':')[1];
+                const errDetails = err.message.replace("Failed to execute 'querySelectorAll' on 'Document': ", '');
                 document.querySelector('#invalid').innerText = errDetails;
             }
         }
+        function updateHtml() {
+            const html = document.querySelector('#html-input').value;
+            let sanitizedHtml = DOMPurify.sanitize(html);
+            document.querySelector('#html-playground').innerHTML = sanitizedHtml;
+            updateHighlight();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('#html-input').value = initialHTML;
+            document.querySelector('#selector').value = initialSelector;
+            updateHtml();
+        });
     </script>
 </head>
 <body>
-    <input type="text" size="100" id="selector" placeholder="experiment with selectors here"
-           value="ul" oninput="highlightSelected(this.value)">
-    <label id="invalid"></label>
-    <div id="a">
-        a
-        <div id="aa">
-            aa
-        </div>
-    </div>
-    <div id="b">
-        b
-        <ul class="highlighted">
-           <li>1</li>
-           <li>2</li>
-        </ul>
-    </div>
+    <header>
+        <h1>CSS Selector Playground</h1>
+    </header>
+    <main>
+        <section>
+          <h2>Type any CSS selector here</h2>
+          <p>Any valid selector will do</p>
+          <input type="text" size="100" id="selector" placeholder="experiment with selectors here" value="#b li:nth-child(even)" oninput="updateHighlight()">
+          <label id="invalid"></label>
+        </section>
+      </main>
+      <section>
+        <h2>Matched elements</h2>
+        <p>See the HTML elements matching your selector highlighted in orange</p>
+        <div id="html-playground"></div>
+      </section>
+      <section>
+        <h2>This is the HTML for the playground above</h2>
+        <p>Feel free to change it </p>
+        <textarea id="html-input" oninput="updateHtml()"></textarea>
+      </section>
 </body>
 </html>

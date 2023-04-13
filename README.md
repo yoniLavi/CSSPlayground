@@ -1,1 +1,1 @@
-A proof of concept playground for seeing how css selectors behave.
+A proof of concept educational playground for experimenting with css selectors.
